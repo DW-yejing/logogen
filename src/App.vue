@@ -30,3 +30,6 @@ body,
   justify-content: center;
 }
 </style>
+<style lang="less" rel="stylesheet/less">
+ @import './assets/style/font.css';
+</style>

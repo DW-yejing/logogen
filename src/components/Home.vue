@@ -1,37 +1,48 @@
 <template>
   <div class="home">
-    <div class='box'>
-        <div class="logo" id="logo">
-            <span v-for="(item, index) in textAreas" :key='item.tid' contenteditable
-                @input="updateText(index, $event)" spellcheck="false" @focus="updateFocusEle(index)" :style="{'font-size': item.fontSize+'px', 'color': item.color, 'background-color': item.bgColor}"
-            >{{item.value}}</span>
+    <div class='box' id="box">
+        <div class="logo" id="logo" :style="{ 'font-size': fontSize + 'px', 'background-color': logoBgColor}">
+            <span v-for="(item, index) in textAreas" :key='item.tid' contenteditable v-text="item.value"
+                @blur="updateText(index, $event)" spellcheck="false" @focus="updateFocusEle(index)" 
+                :style="{'font-size': item.fontSize+'px', 'color': item.color, 'background-color': item.bgColor, 'font-family':item.tfont }"
+            ></span>
         </div>
     </div>
 
     <div class='text-add-remove'>
-        <div class='additem' v-tooltip="{content: 'append a new text area to logo', show: true}" @click="additem">Add TextArea</div>
-        <div class='removeitem' v-tooltip='{content: "remove the focused text area from logo", show: true}' @click="removeitem">Remove TextArea</div>
+        <div class='additem' v-tooltip="{content: 'append a new text area to logo', show: false}" @click="additem">Add TextArea</div>
+        <div class='removeitem' v-tooltip='{content: "remove the focused text area from logo", show: false}' @click="removeitem">Remove TextArea</div>
     </div>
 
-    <div>
+    <div class="currentText">
         Current Text: &nbsp;<span>{{currentText}}</span>
         <input id="currentTid" hidden v-model="currentTid" />
     </div>
 
-    <div class='customize'>
-        <div>Text Color: &nbsp; <input type="color" v-model="textColor" @change="updateColor"/></div>
-        <div>Background Color: &nbsp; <input type="color" v-model="bgColor" @change="updateBgColor" /></div>
-    </div>
 
-    <div class="customize-misc">
-        <div>
-            Font Size: <input type="range" min="30" max="200" v-model="fontSize" @change="updateFontSize"/> {{ fontSize }}px
+    <div class='customize'>
+        <div class="customize-color">
+            <div>Text Color: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <input type="color" v-model="textColor" @change="updateColor"/></div>
+            <div>Background Color: &nbsp; <input type="color" v-model="bgColor" @change="updateBgColor" /></div>
+            <div>Logo Background: &nbsp; <input type="color" v-model="logoBgColor"/></div>
+        </div>
+
+        <div class="customize-misc">
+            <div>
+                Font Size: <input type="range" min="30" max="200" v-model="fontSize" @change="updateFontSize"/> {{ fontSize }}px
+            </div>
+            <div>
+                Fonts: <select id="fontSelector" @change="updateFont()">
+                    <option v-for="item in webFonts" :key="item">{{item}}</option>
+                    <option v-for="item in fonts" :key="item">{{item}}</option>
+                </select>
+            </div>
         </div>
     </div>
 
     <div class="download-share">
         <div class="download"
-            v-tooltip="{ content: 'Export your own logo', show: true, classes: 'tooltipClasses' }"
+            v-tooltip="{ content: 'Export your own logo', show: false, classes: 'tooltipClasses' }"
             @click="download"
         >
             Export
@@ -49,24 +60,29 @@ export default {
   data () {
     return {
         currentTid: 0,
-        bgColor: "black",
-        textColor: "red",
-        fontSize: "30",
+        bgColor: '#000000',
+        textColor: "#ffffff",
+        fontSize: "60",
         currentText: "edit",
+        fonts:[],
+        webFonts: ['Comic Sans MS', 'Arial', 'Lucida Family', 'Arial Black', 'Arial Narrow', 'Verdana', 'Georgia', 'Times New Roman', ' Trebuchet MS', 'Courier New', 'Impact', 'Tahoma', 'Courier', 'Lucida Sans Unicode', 'Lucida Console', 'Garamond', 'MS Sans Serif', 'MS Serif'],
+        logoBgColor: '#000000',
         textAreas: [
             {
                 tid: 1,
                 value: 'edit',
                 color: 'white',
                 fontSize: '60',
-                bgColor: 'black'
+                bgColor: 'black',
+                tfont: 'Arial'
             },
             {
                 tid: 2,
                 value: 'me',
-                color: 'yellow',
+                color: 'black',
                 fontSize: '60',
-                bgColor: 'black'
+                bgColor: '#f90',
+                tfont: 'Arial'
             }
         ]
     }
@@ -82,7 +98,8 @@ export default {
                 value: 'more',
                 color: 'white',
                 fontSize: '60',
-                bgColor: 'black'
+                bgColor: 'black',
+                tfont: 'Arial'
             };
           var index = parseInt(this.currentTid);
           if(index<this.textAreas.length){
@@ -105,21 +122,46 @@ export default {
           }
           this.textAreas.splice(index, 1)
       },
+      downloadIamge(imgsrc, name) {//下载图片地址和图片名
+        let image = new Image();
+        // 解决跨域 Canvas 污染问题
+        image.setAttribute("crossOrigin", "anonymous");
+        image.onload = function() {
+            let canvas = document.createElement("canvas");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            let context = canvas.getContext("2d");
+            context.drawImage(image, 0, 0, image.width, image.height);
+            let url = canvas.toDataURL("image/png"); 
+            let a = document.createElement("a"); 
+            let event = new MouseEvent("click"); 
+            a.download = name || "photo"; 
+            a.href = url; 
+            a.dispatchEvent(event); 
+        };
+        image.src = imgsrc;
+      },
       download: function(){
-
+        var that=this
+        var node = document.getElementById('logo')
+        domtoimage.toPng(node).then(function(res) {
+            console.log(res)
+            that.downloadIamge(res,"logo")
+        })
       },
       updateText: function(idx, e){    
         this.textAreas[idx].value = '';
-        if(e.target.childNodes[0] && e.target.childNodes[0].nodeValue){
-            this.textAreas[idx].value = e.target.childNodes[0].nodeValue;
+        if(e.target && e.target.innerText){
+            this.textAreas[idx].value = e.target.innerText;
         }
+        this.currentText = this.textAreas[idx].value;
       },
       updateColor: function(){
           var index = parseInt(this.currentTid);
           this.textAreas[index].color=this.textColor;
       },
       updateBgColor: function(){
-          var index = parseInt(this.currentTid);
+        var index = parseInt(this.currentTid);
         this.textAreas[index].bgColor=this.bgColor;
       },
       updateFontSize: function(){
@@ -129,13 +171,20 @@ export default {
       updateFocusEle: function(idx){
           this.currentTid = idx;
           this.currentText = this.textAreas[this.currentTid].value;
+      },
+      updateFont: function(){
+          var fontSelector = document.getElementById("fontSelector");
+          var font = fontSelector.options[fontSelector.selectedIndex].innerText;
+          var index = parseInt(this.currentTid);
+          this.textAreas[index].tfont = font;
       }
 
   },
   watch:{
       bgColor: function(val, oldVal){
           var idx = this.currentTid;
-          idx = idx%this.textAreas.length;
+          var len = this.textAreas.length;
+          idx = idx%len;
           var textArea = this.textAreas[idx];
           if(!textArea){
               return;
@@ -143,8 +192,9 @@ export default {
           textArea.bgColor = val;
       },
       textColor: function(val, oldVal){
-        var idx = this.currentTid;
-          idx = idx%textAreas;
+          var idx = this.currentTid;
+          var len = this.textAreas.length;
+          idx = idx%len;
           var textArea = this.textAreas[idx];
           if(!textArea){
               return;
@@ -153,7 +203,8 @@ export default {
       },
       fontSize: function(val, oldVal){
           var idx = this.currentTid;
-          idx = idx%textAreas;
+          var len = this.textAreas.length;
+          idx = idx%len;
           var textArea = this.textAreas[idx];
           if(!textArea){
               return;
@@ -172,9 +223,12 @@ export default {
   display flex
   flex-direction  column
   align-items center
+  width 60%
+  padding 20px 20%
 .text-add-remove
     display flex
     justify-content space-around
+    width 80%
     & > div
         width 200px
         height 40px
@@ -201,14 +255,14 @@ export default {
       color black
       background #f90
 .customize
-.customize-misc
     display flex
     justify-content space-around
     width 100%
     margin-bottom 50px
     .customize-color > div,
     .customize-misc > div
-        padding 8px 0
+        padding 10px 100px
+        width max-content
 
 .box
     border 1px solid #333
@@ -216,8 +270,6 @@ export default {
     padding 40px
     margin 40px 10px
     max-width 100%
-    // width auto
-    // display inline-block!important
     .logo
         padding 20px
         text-align center
@@ -226,4 +278,6 @@ export default {
         >span 
             padding 5px 5px
             border-radius 7px
+.currentText
+    margin 20px
 </style>
