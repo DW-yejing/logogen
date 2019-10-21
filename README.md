@@ -2,7 +2,7 @@
 
 ![code size](https://img.shields.io/github/languages/code-size/DW-yejing/logogen) ![license](https://img.shields.io/github/license/DW-yejing/logogen) ![issues](https://img.shields.io/github/issues/DW-yejing/logogen) ![stars](https://img.shields.io/github/stars/DW-yejing/logogen?style=social)
 
-logogen is a logo generator that can customize color, font and layout. You can visit ![http://149.28.25.37:81/](http://149.28.25.37:81/)
+logogen is a logo generator that can customize color, font and layout. You can visit [http://149.28.25.37:81/](http://149.28.25.37:81/)
 
 ## Screenshot
 
