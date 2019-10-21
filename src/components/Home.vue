@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <Ribbon></Ribbon>
     <div class='box' id="box">
         <div class="logo" id="logo" :style="{ 'font-size': fontSize + 'px', 'background-color': logoBgColor}">
             <span v-for="(item, index) in textAreas" :key='item.tid' contenteditable v-text="item.value"
@@ -52,11 +53,15 @@
 </template>
 
 <script>
-import domtoimage from 'dom-to-image'
-const FileSaver = require('file-saver')
+import domtoimage from 'dom-to-image';
+import Ribbon from "./Ribbon";
+const FileSaver = require('file-saver');
 
 export default {
   name: 'Home',
+  components: {
+      Ribbon
+  },
   data () {
     return {
         currentTid: 0,
@@ -96,9 +101,9 @@ export default {
           var newNode = {
                 tid: this.textAreas.length+1,
                 value: 'more',
-                color: 'white',
+                color: '#FFFFFF',
                 fontSize: '60',
-                bgColor: 'black',
+                bgColor: '#000000',
                 tfont: 'Arial'
             };
           var index = parseInt(this.currentTid);
