@@ -71,17 +71,17 @@ export default {
             {
                 tid: 1,
                 value: 'edit',
-                color: 'white',
+                color: '#FFFFFF',
                 fontSize: '60',
-                bgColor: 'black',
+                bgColor: '#000000',
                 tfont: 'Arial'
             },
             {
                 tid: 2,
                 value: 'me',
-                color: 'black',
+                color: '#000000',
                 fontSize: '60',
-                bgColor: '#f90',
+                bgColor: '#FF9900',
                 tfont: 'Arial'
             }
         ]
@@ -171,6 +171,17 @@ export default {
       updateFocusEle: function(idx){
           this.currentTid = idx;
           this.currentText = this.textAreas[this.currentTid].value;
+          this.textColor = this.textAreas[idx].color;
+          this.bgColor = this.textAreas[idx].bgColor;
+          this.fontSize = this.textAreas[idx].fontSize;
+          var selectedFont = this.textAreas[idx].tfont;
+          var fontSelector = document.getElementById("fontSelector");
+          for(var i=0,j=this.webFonts.length; i<j; i++){
+              if (fontSelector.options[i].value == selectedFont){
+                fontSelector.options[i].selected = true;
+                break;
+              }
+          }
       },
       updateFont: function(){
           var fontSelector = document.getElementById("fontSelector");
